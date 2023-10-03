@@ -68,9 +68,9 @@ public class CategoryServiceImpl implements ICategoryService{
 		CategoryResponseRest response = new CategoryResponseRest();
 		List<Category> list = new ArrayList<>();
 		try {
-			Category categorysaved = categoryDao.save(category);
-			if(categorysaved != null) {
-				list.add(categorysaved);
+			Category categorySaved = categoryDao.save(category);
+			if(categorySaved != null) {
+				list.add(categorySaved);
 				response.setMetaData("Respuesta OK", "00", "Respuesta exitosa");
 				response.getCategoryResponse().setCategory(list);
 			}else {
@@ -79,6 +79,45 @@ public class CategoryServiceImpl implements ICategoryService{
 			}
 		}catch (Exception e) {
 			response.setMetaData("Respuesta no OK", "-1", "Error al almacenar la categoria");
+			e.getStackTrace();
+			return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.OK);
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<CategoryResponseRest> update(long id, Category category) {
+		CategoryResponseRest response = new CategoryResponseRest();
+		List<Category> list = new ArrayList<>();
+		
+		
+		try {
+			Optional<Category> buscarCategoria = categoryDao.findById(id);
+			
+			if(buscarCategoria.isPresent()) {
+				buscarCategoria.get().setName(category.getName());
+				buscarCategoria.get().setDescription(category.getDescription());
+				
+				Category categoryUpdate = categoryDao.save(buscarCategoria.get());
+				if(categoryUpdate != null) {
+					list.add(categoryUpdate);
+					response.setMetaData("Respuesta OK", "00", "Respuesta exitosa");
+					response.getCategoryResponse().setCategory(list);
+				}else {
+					response.setMetaData("Respuesta no OK", "-1", "Categoria no actualizada");
+					return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.BAD_REQUEST);
+				}
+				
+			}else {
+				response.setMetaData("Respuesta no OK", "404", "Categoria no actualizada");
+				return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.NOT_FOUND);
+			}
+			
+			
+			
+		}catch (Exception e) {
+			response.setMetaData("Respuesta no OK", "-1", "Error al actualizar la categoria");
 			e.getStackTrace();
 			return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
