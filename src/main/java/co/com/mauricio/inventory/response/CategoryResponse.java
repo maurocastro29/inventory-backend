@@ -15,9 +15,8 @@ public class CategoryResponse {
 		return category;
 	}
 	
-	public void setCategory(List<Category> category2) {
-		// TODO Auto-generated method stub
-		
+	public void setCategory(List<Category> category) {
+		this.category = category;
 	}
 
 }
